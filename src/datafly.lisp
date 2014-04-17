@@ -11,6 +11,7 @@
                 :*trace-sql*
                 :connect-cached
                 :connect-toplevel
+                :disconnect-toplevel
                 :retrieve-one
                 :retrieve-one-value
                 :retrieve-all
@@ -33,6 +34,7 @@
            :*trace-sql*
            :connect-cached
            :connect-toplevel
+           :disconnect-toplevel
            :retrieve-one
            :retrieve-one-value
            :retrieve-all

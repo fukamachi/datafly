@@ -51,6 +51,11 @@
   (setf *connection*
         (apply #'connect-cached connect-args)))
 
+@export
+(defun disconnect-toplevel ()
+  (when *connection*
+    (dbi:disconnect *connection*)))
+
 (defun connection-quote-character (conn)
   (case (connection-driver-type conn)
     (:mysql #\`)

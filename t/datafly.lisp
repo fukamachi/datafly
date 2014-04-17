@@ -120,7 +120,7 @@
       (is (user-tweets user) test-val :test #'eq
           "Set cache value"))
 
-    (datafly.cache:clear-model-caches 'user)
+    (datafly.cache:clear-object-caches user)
 
     (is (length (user-tweets user)) 3)))
 

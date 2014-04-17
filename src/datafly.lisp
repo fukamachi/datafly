@@ -21,7 +21,8 @@
                 :object-to-plist
                 :copy-model)
   (:import-from :datafly.cache
-                :clear-model-caches)
+                :clear-model-caches
+                :clear-object-caches)
   (:import-from :datafly.inflate
                 :tinyint-to-boolean
                 :datetime-to-timestamp
@@ -43,6 +44,7 @@
            :copy-model
 
            :clear-model-caches
+           :clear-object-caches
 
            :tinyint-to-boolean
            :datetime-to-timestamp

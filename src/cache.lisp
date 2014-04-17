@@ -9,7 +9,7 @@
 
 (syntax:use-syntax :annot)
 
-(defvar *model-cache* (make-hash-table :test 'eq))
+(defvar *model-accessors* (make-hash-table :test 'eq))
 
 @export
 (defmacro defcached-accessor (name args cache-args &body body)
@@ -30,14 +30,14 @@
   (mapc (compose #'clear-cache #'accessor-cache)
         (if accessor
             (list accessor)
-            (gethash model *model-cache*))))
+            (gethash model *model-accessors*))))
 
 @export
 (defun clear-object-caches (object &optional accessor)
   (let ((caches (mapcar #'accessor-cache
                         (if accessor
                             (list accessor)
-                            (gethash (class-name (class-of object)) *model-cache*)))))
+                            (gethash (class-name (class-of object)) *model-accessors*)))))
     (iter (for cache in caches)
       (iter (for (key) in-hashtable (cached-results cache))
         (when (eq (car key) object)

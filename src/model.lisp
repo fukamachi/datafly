@@ -9,7 +9,7 @@
                 :retrieve-all)
   (:import-from :datafly.cache
                 :defcached-accessor
-                :*model-cache*)
+                :*model-accessors*)
   (:import-from :datafly.util
                 :partition)
   (:import-from :alexandria
@@ -89,7 +89,7 @@
                                            (offset offset)))
                                     (and (find-class ',table nil)
                                          '(:as ,table))))))))))
-           ,@(progn (setf (gethash name *model-cache*) accessors) nil)
+           ,@(progn (setf (gethash name *model-accessors*) accessors) nil)
            (defstruct (,name
                        (:constructor ,(intern (format nil "~A~A"
                                                       (string :make-) name))

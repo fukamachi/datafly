@@ -75,19 +75,14 @@
                                     (let ((,sxql-query (with-slots (,@slot-names) ,name
                                                          (declare (ignorable ,@slot-names))
                                                          ,sxql)))
-                                      ;; XXX: Using private symbols of SxQL.
-                                      (when (and limit
-                                                 (not (find 'sxql.clause::limit-clause
-                                                            (sxql.sql-type:sql-composed-statement-children ,sxql-query)
-                                                            :key #'type-of
-                                                            :test #'eq)))
-                                        (sxql:add-child ,sxql-query (limit limit)))
-                                      (when (and offset
-                                                 (not (find 'sxql.clause::offset-clause
-                                                            (sxql.sql-type:sql-composed-statement-children ,sxql-query)
-                                                            :key #'type-of
-                                                            :test #'eq)))
-                                        (sxql:add-child ,sxql-query (offset offset)))
+                                      (setf (sxql.statement:select-statement-limit-clause ,sxql-query)
+                                            (if limit
+                                                (list (limit limit))
+                                                nil))
+                                      (setf (sxql.statement:select-statement-offset-clause ,sxql-query)
+                                            (if offset
+                                                (list (offset offset))
+                                                nil))
                                       ,sxql-query)
                                     (and (find-class ',(or model-class slot-name) nil)
                                          '(:as ,(or model-class slot-name)))))))))))

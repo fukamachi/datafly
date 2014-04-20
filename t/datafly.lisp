@@ -11,7 +11,7 @@
         :sxql))
 (in-package :datafly-test)
 
-(plan 11)
+(plan 12)
 
 (defparameter *db-path*
   (asdf:system-relative-pathname :datafly #P"t/test.db"))
@@ -106,6 +106,7 @@
     (is (length (user-tweets user)) 2)
     (is (tweet-id (car (user-tweets user :limit 1))) 2)
     (is (tweet-id (car (user-tweets user :limit 1 :offset 1))) 1)
+    (is (length (user-tweets user :limit 2)) 2)
     (ok (every (lambda (tweet)
                  (typep tweet 'tweet))
                (user-tweets user)))

@@ -75,7 +75,7 @@
 
 (defun convert-row (row &key as)
   (when-let ((row
-              (iter (for (column value . nil) on row by #'cddr)
+              (iter (for (column value) on row by #'cddr)
                 (collect (convert-column-name column))
                 (collect (convert-column-value value)))))
     (if as

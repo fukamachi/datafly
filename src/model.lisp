@@ -45,50 +45,52 @@
            ,@(multiple-value-bind (has-a-options rest-options)
                  (partition :has-a options :key #'car :test #'eq)
                (setf options rest-options)
-               (iter (for (has-a table where) in has-a-options)
-                 (ematch (ensure-list table)
-                   ((or (list table)
-                        (list slot-name table))
-                    (let ((accessor (intern (format nil "~A~A" conc-name (or slot-name table)))))
+               (iter (for (has-a accessor-definition sxql) in has-a-options)
+                 (ematch (ensure-list accessor-definition)
+                   ((or (list slot-name)
+                        (list slot-name model-class))
+                    (let ((accessor (intern (format nil "~A~A" conc-name slot-name))))
                       (push accessor accessors)
                       (collect
                           `(defcached-accessor ,accessor (,name) (,name)
                              (apply #'retrieve-one
-                                    (select :*
-                                      (from ,(make-keyword (substitute #\_ #\- (string-upcase table))))
-                                      (with-slots (,@slot-names) ,name
-                                        (declare (ignorable ,@slot-names))
-                                        ,where)
-                                      (limit 1))
-                                    (and (find-class ',table nil)
-                                         '(:as ,table))))))))))
+                                    (with-slots (,@slot-names) ,name
+                                      (declare (ignorable ,@slot-names))
+                                      ,sxql)
+                                    (and (find-class ',(or model-class slot-name) nil)
+                                         '(:as ,(or model-class slot-name)))))))))))
            ,@(multiple-value-bind (has-many-options rest-options)
                  (partition :has-many options :key #'car :test #'eq)
                (setf options rest-options)
-               (iter (for (has-many table where order-by) in has-many-options)
-                 (ematch (ensure-list table)
-                   ((or (list table)
-                        (list slot-name table))
-                    (let ((accessor (intern (format nil "~A~A" conc-name (or slot-name table)))))
+               (iter (for (has-many accessor-definition sxql) in has-many-options)
+                 (ematch (ensure-list accessor-definition)
+                   ((or (list slot-name)
+                        (list slot-name model-class))
+                    (let ((accessor (intern (format nil "~A~A" conc-name slot-name)))
+                          (sxql-query (gensym "SXQL")))
                       (push accessor accessors)
                       (collect
                           `(defcached-accessor ,accessor (,name &key limit offset) (,name :limit limit :offset offset)
                              (apply #'retrieve-all
-                                    (select :*
-                                      (from ,(make-keyword (substitute #\_ #\- (string-upcase table))))
-                                      (with-slots (,@slot-names) ,name
-                                        (declare (ignorable ,@slot-names))
-                                        ,where)
-                                      ,@(and order-by
-                                             `((with-slots (,@slot-names) ,name
-                                                 (declare (ignorable ,@slot-names))
-                                                 ,order-by)))
-                                      (and limit
-                                           (limit limit))
-                                      (and offset
-                                           (offset offset)))
-                                    (and (find-class ',table nil)
-                                         '(:as ,table))))))))))
+                                    (let ((,sxql-query (with-slots (,@slot-names) ,name
+                                                         (declare (ignorable ,@slot-names))
+                                                         ,sxql)))
+                                      ;; XXX: Using private symbols of SxQL.
+                                      (when (and limit
+                                                 (not (find 'sxql.clause::limit-clause
+                                                            (sxql.sql-type:sql-composed-statement-children ,sxql-query)
+                                                            :key #'type-of
+                                                            :test #'eq)))
+                                        (sxql:add-child ,sxql-query (limit limit)))
+                                      (when (and offset
+                                                 (not (find 'sxql.clause::offset-clause
+                                                            (sxql.sql-type:sql-composed-statement-children ,sxql-query)
+                                                            :key #'type-of
+                                                            :test #'eq)))
+                                        (sxql:add-child ,sxql-query (offset offset)))
+                                      ,sxql-query)
+                                    (and (find-class ',(or model-class slot-name) nil)
+                                         '(:as ,(or model-class slot-name)))))))))))
            ,@(progn (setf (gethash name *model-accessors*) accessors) nil)
            (defstruct (,name
                        (:constructor ,(intern (format nil "~A~A"

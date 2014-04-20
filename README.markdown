@@ -105,8 +105,10 @@ Datafly provides a macro `defmodel` which defines a flavored structure class.
 (defmodel (user (:inflate registered-at #'datetime-to-timestamp)
                 (:has-a config (where (:= :user_id id)))
                 (:has-many (tweets tweet)
-                 (where (:= :user_id id))
-                 (order-by (:desc :created_at))))
+                 (select :*
+                   (from :tweet)
+                   (where (:= :user_id id))
+                   (order-by (:desc :created_at)))))
   id
   name
   email

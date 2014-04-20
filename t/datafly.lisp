@@ -74,7 +74,12 @@
 @model
 (defstruct (user (:inflate (created-at updated-at) #'datetime-to-timestamp)
                  (:inflate status #'string-to-keyword)
-                 (:has-many (tweets tweet) (where (:= :user_id id)) (order-by (:desc :created_at) (:desc :id))))
+                 (:has-many (tweets tweet)
+                  (select :*
+                    (from :tweet)
+
+                    (where (:= :user_id id))
+                    (order-by (:desc :created_at) (:desc :id)))))
   id
   name
   email

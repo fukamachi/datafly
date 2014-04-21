@@ -54,7 +54,8 @@
 @export
 (defun disconnect-toplevel ()
   (when *connection*
-    (dbi:disconnect *connection*)))
+    (dbi:disconnect *connection*)
+    (setf *connection* nil)))
 
 (defun connection-quote-character (conn)
   (case (connection-driver-type conn)

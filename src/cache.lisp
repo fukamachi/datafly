@@ -21,7 +21,9 @@
          (setf (get-cached-value ,cache (list ,@cache-args)) (list new))))))
 
 (defun accessor-cache (accessor)
-  (symbol-value (intern (format nil "*~A-~A*" accessor :cache))))
+  (let ((cache-symbol (intern (format nil "*~A-~A*" accessor :cache))))
+    (when (boundp cache-symbol)
+      (symbol-value cache-symbol))))
 
 @export
 (defun clear-model-caches (model &optional accessor)
@@ -39,6 +41,7 @@
                             (list accessor)
                             (gethash (class-name (class-of object)) *model-accessors*)))))
     (iter (for cache in caches)
-      (iter (for (key) in-hashtable (cached-results cache))
-        (when (eq (car key) object)
-          (clear-cache cache key))))))
+      (when cache
+        (iter (for (key) in-hashtable (cached-results cache))
+          (when (eq (car key) object)
+            (clear-cache cache key)))))))

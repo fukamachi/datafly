@@ -9,6 +9,7 @@
   (:import-from :datafly.db
                 :*connection*
                 :*trace-sql*
+                :*default-row-type*
                 :connect-cached
                 :connect-toplevel
                 :disconnect-toplevel
@@ -32,6 +33,7 @@
                 :octet-vector-to-string)
   (:export :*connection*
            :*trace-sql*
+           :*default-row-type*
            :connect-cached
            :connect-toplevel
            :disconnect-toplevel

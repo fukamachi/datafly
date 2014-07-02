@@ -20,6 +20,7 @@
   :license "BSD 3-Clause"
   :depends-on (:iterate
                :optima
+               :trivial-types
                :closer-mop
                :cl-syntax-annot
                :sxql

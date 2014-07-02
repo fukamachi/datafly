@@ -12,8 +12,9 @@
                 :connect
                 :disconnect
                 :connection-driver-type)
-  (:import-from :alexandria
-                :when-let))
+  (:import-from :trivial-types
+                :property-list
+                :association-list))
 (in-package :datafly.db)
 
 (syntax:use-syntax :annot)
@@ -25,6 +26,9 @@
 
 @export
 (defvar *trace-sql* nil)
+
+@export
+(defvar *default-row-type* 'property-list)
 
 @export
 (defun database-type ()
@@ -74,19 +78,33 @@
       nil
       value))
 
-(defun convert-row (row &key as)
-  (when-let ((row
-              (iter (for (column value) on row by #'cddr)
-                (collect (convert-column-name column))
-                (collect (convert-column-value value)))))
-    (if as
-        (let* ((class (find-class as))
-               (class-name (class-name class))
-               (class-package (symbol-package class-name))
-               (constructor (intern (format nil "~A~A" #.(string :make-) class-name)
-                                    class-package)))
-          (apply (symbol-function constructor) row))
-        row)))
+(defun convert-row (row &key (as *default-row-type*))
+  (when row
+    (case as
+      ((null property-list)
+       (iter (for (column value) on row by #'cddr)
+         (collect (convert-column-name column))
+         (collect (convert-column-value value))))
+      (association-list
+       (iter (for (column value) on row by #'cddr)
+         (collect (cons (convert-column-name column)
+                        (convert-column-value value)))))
+      (hash-table
+       (let ((hash (make-hash-table :test 'eq)))
+         (iter (for (column value) on row by #'cddr)
+           (setf (gethash (convert-column-name column) hash)
+                 (convert-column-value value)))
+         hash))
+      (T
+       (let* ((class (find-class as))
+              (class-name (class-name class))
+              (class-package (symbol-package class-name))
+              (constructor (intern (format nil "~A~A" #.(string :make-) class-name)
+                                   class-package))
+              (row (iter (for (column value) on row by #'cddr)
+                     (collect (convert-column-name column))
+                     (collect (convert-column-value value)))))
+         (apply (symbol-function constructor) row))))))
 
 (defun execute-with-connection (conn statement)
   (check-type conn dbi.driver:<dbi-connection>)
@@ -100,7 +118,7 @@
       (apply #'dbi:execute prepared params))))
 
 @export
-(defun retrieve-one (statement &key by = as)
+(defun retrieve-one (statement &key by = (as *default-row-type*))
   (assert (eq (null by) (null =)))
   (when (keywordp statement)
     (setf statement
@@ -121,7 +139,7 @@
       (second (retrieve-one statement))))
 
 @export
-(defun retrieve-all (statement &key as)
+(defun retrieve-all (statement &key (as *default-row-type*))
   (mapcar (lambda (row)
             (convert-row row :as as))
           (dbi:fetch-all (execute-with-connection *connection* statement))))

@@ -11,7 +11,7 @@
         :sxql))
 (in-package :datafly-test)
 
-(plan 12)
+(plan 16)
 
 (defparameter *db-path*
   (asdf:system-relative-pathname :datafly #P"t/test.db"))
@@ -129,5 +129,23 @@
     (datafly.cache:clear-object-caches user)
 
     (is (length (user-tweets user)) 3)))
+
+(with-connection
+  (let ((user (retrieve-one :user
+                            :by :name := "nitro_idiot")))
+    (is-type user 'trivial-types:property-list))
+  (let ((user (retrieve-one :user
+                            :by :name := "nitro_idiot"
+                            :as 'hash-table)))
+    (is-type user 'hash-table))
+  (let* ((*default-row-type* 'hash-table)
+         (user (retrieve-one :user
+                             :by :name := "nitro_idiot")))
+    (is-type user 'hash-table))
+  (let* ((*default-row-type* 'hash-table)
+         (user (retrieve-one :user
+                             :by :name := "nitro_idiot"
+                             :as 'trivial-types:association-list)))
+    (is-type user 'trivial-types:association-list)))
 
 (finalize)

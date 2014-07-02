@@ -33,7 +33,7 @@ They take a [SxQL](https://github.com/fukamachi/sxql) statement.
          :created_at (princ-to-string *now*))))
 ```
 
-If you specify `:as` option with a structure name to retrieval functions, they create instances of the class for each rows.
+If you specify `:as` option with a class name to retrieval functions, they create instances of the class for each rows.
 
 ```common-lisp
 (defstruct user
@@ -136,6 +136,38 @@ Datafly provides a macro `defmodel` which defines a flavored structure class.
 * `unixtime-to-timestamp`
 * `string-to-keyword`
 * `octet-vector-to-string`
+
+## Tips: Getting Association List or Hash Table for each rows
+
+`retrieve-one` and `retrieve-all` return row(s) as a property list or a list of property lists by default.
+
+If you'd like they were other types, for example "Association List" or "Hash Table", you can do it by passing `:as` parameter.
+
+```common-lisp
+(retrieve-one
+  (select :*
+    (from :user)
+    (where (:= :name "nitro_idiot")))
+  :as 'trivial-types:association-list)
+;=> ((:ID . 1) (:NAME . "nitro_idiot") (:EMAIL . "nitro_idiot@example.com") (:REGISTERED-AT . "2014-04-14T19:20:13"))
+
+(retrieve-one
+  (select :*
+    (from :user)
+    (where (:= :name "nitro_idiot")))
+  :as 'hash-table)
+;=> #<HASH-TABLE :TEST EQL :COUNT 4 {1007AE3CD3}>
+```
+
+If no `:as` parameter is specified, `*default-row-type*` will be used.
+
+```common-lisp
+(let ((*default-row-type* 'hash-table))
+  (retrieve-all
+    (select :*
+      (from :user))))
+;=> (#<HASH-TABLE :TEST EQL :COUNT 4 {100815FA03}> #<HASH-TABLE :TEST EQL :COUNT 4 {100815FE43}>)
+```
 
 ## See Also
 

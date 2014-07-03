@@ -3,6 +3,9 @@
   (:use :cl
         :iterate
         :sxql)
+  (:import-from :datafly.logger
+                :*sql-logger*
+                :*trace-sql*)
   (:import-from :dbi
                 :prepare
                 #+nil :execute
@@ -23,9 +26,6 @@
 (defvar *connection* nil)
 
 (defvar *connections* (make-hash-table :test 'equal))
-
-@export
-(defvar *trace-sql* nil)
 
 @export
 (defvar *default-row-type* 'property-list)
@@ -113,7 +113,8 @@
                                         (connection-quote-character *connection*))))
         (sxql:yield statement))
     (when *trace-sql*
-      (format t "~&~A (~{~S~^, ~})~%" sql params))
+      (log:trace :logger *sql-logger*
+                 "~A (~{~S~^, ~})" sql params))
     (let ((prepared (dbi:prepare conn sql)))
       (apply #'dbi:execute prepared params))))
 

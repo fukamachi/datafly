@@ -29,13 +29,15 @@
                :babel
                :local-time
                :function-cache
-               :cl-json)
+               :cl-json
+               :log4cl)
   :components ((:module "src"
                 :components
-                ((:file "datafly" :depends-on ("model" "db" "cache" "inflate" "json"))
+                ((:file "datafly" :depends-on ("model" "db" "cache" "logger" "inflate" "json"))
                  (:file "model" :depends-on ("db" "cache" "util"))
-                 (:file "db")
+                 (:file "db" :depends-on ("logger"))
                  (:file "cache")
+                 (:file "logger")
                  (:file "inflate" :depends-on ("db"))
                  (:file "json")
                  (:file "util"))))

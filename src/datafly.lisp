@@ -8,7 +8,6 @@
   (:use :cl)
   (:import-from :datafly.db
                 :*connection*
-                :*trace-sql*
                 :*default-row-type*
                 :connect-cached
                 :connect-toplevel
@@ -25,6 +24,9 @@
   (:import-from :datafly.cache
                 :clear-model-caches
                 :clear-object-caches)
+  (:import-from :datafly.logger
+                :*trace-sql*
+                :*sql-logger*)
   (:import-from :datafly.inflate
                 :tinyint-to-boolean
                 :datetime-to-timestamp
@@ -34,7 +36,6 @@
   (:import-from :datafly.json
                 :encode-json)
   (:export :*connection*
-           :*trace-sql*
            :*default-row-type*
            :connect-cached
            :connect-toplevel
@@ -51,6 +52,9 @@
 
            :clear-model-caches
            :clear-object-caches
+
+           :*trace-sql*
+           :*sql-logger*
 
            :tinyint-to-boolean
            :datetime-to-timestamp

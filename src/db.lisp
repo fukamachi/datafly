@@ -106,6 +106,20 @@
                      (collect (convert-column-value value)))))
          (apply (symbol-function constructor) row))))))
 
+(defun get-prev-stack ()
+  #+sbcl
+  (let (prev-stack)
+    (sb-debug::map-backtrace
+     (lambda (frame)
+       (let ((fun (sb-di::debug-fun-name (sb-di::frame-debug-fun frame))))
+         (when (and (null prev-stack)
+                    (symbolp fun)
+                    (not (find (package-name (symbol-package fun))
+                               (list :common-lisp :datafly.db :function-cache)
+                               :test #'string=)))
+           (setf prev-stack fun)))))
+    prev-stack))
+
 (defun execute-with-connection (conn statement)
   (check-type conn dbi.driver:<dbi-connection>)
   (multiple-value-bind (sql params)
@@ -113,8 +127,9 @@
                                         (connection-quote-character *connection*))))
         (sxql:yield statement))
     (when *trace-sql*
-      (log:trace :logger *sql-logger*
-                 "~A (~{~S~^, ~})" sql params))
+      (let ((stack (get-prev-stack)))
+        (log:trace :logger *sql-logger*
+                   "~A (~{~S~^, ~})~:[~;~:* | ~S~]" sql params stack)))
     (let ((prepared (dbi:prepare conn sql)))
       (apply #'dbi:execute prepared params))))
 

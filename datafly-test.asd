@@ -16,7 +16,8 @@
                :sxql)
   :components ((:module "t"
                 :components
-                ((:test-file "datafly"))))
+                ((:test-file "datafly")
+                 (:test-file "json"))))
 
   :defsystem-depends-on (:cl-test-more)
   :perform (test-op :after (op c)

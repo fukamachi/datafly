@@ -28,14 +28,16 @@
                :alexandria
                :babel
                :local-time
-               :function-cache)
+               :function-cache
+               :cl-json)
   :components ((:module "src"
                 :components
-                ((:file "datafly" :depends-on ("model" "db" "cache" "inflate"))
+                ((:file "datafly" :depends-on ("model" "db" "cache" "inflate" "json"))
                  (:file "model" :depends-on ("db" "cache" "util"))
                  (:file "db")
                  (:file "cache")
                  (:file "inflate" :depends-on ("db"))
+                 (:file "json")
                  (:file "util"))))
   :description "Lightweight database library."
   :long-description

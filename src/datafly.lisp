@@ -31,6 +31,8 @@
                 :unixtime-to-timestamp
                 :string-to-keyword
                 :octet-vector-to-string)
+  (:import-from :datafly.json
+                :encode-json)
   (:export :*connection*
            :*trace-sql*
            :*default-row-type*
@@ -53,5 +55,7 @@
            :tinyint-to-boolean
            :datetime-to-timestamp
            :unixtime-to-timestamp
-           :string-to-keyword))
+           :string-to-keyword
+
+           :encode-json))
 (in-package :datafly)

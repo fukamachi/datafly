@@ -34,7 +34,8 @@
                 :string-to-keyword
                 :octet-vector-to-string)
   (:import-from :datafly.json
-                :encode-json)
+                :encode-json
+                :convert-object)
   (:export :*connection*
            :*default-row-type*
            :connect-cached
@@ -61,5 +62,6 @@
            :unixtime-to-timestamp
            :string-to-keyword
 
-           :encode-json))
+           :encode-json
+           :convert-object))
 (in-package :datafly)

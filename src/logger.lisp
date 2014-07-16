@@ -15,9 +15,8 @@
 (defvar *sql-logger*
   (let ((logger (log:category '(datafly))))
     (log:config logger :own :trace)
-    (log4cl:remove-all-appenders logger)
     (log4cl:add-appender logger
-                         (make-instance 'log4cl:tricky-console-appender
+                         (make-instance 'log4cl:this-console-appender
                                         :layout (make-instance 'log4cl:pattern-layout
                                                                :conversion-pattern *sql-logger-pattern*)))
     logger))

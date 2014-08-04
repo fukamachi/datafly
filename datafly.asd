@@ -1,12 +1,12 @@
 #|
   This file is a part of datafly project.
-  Copyright (c) 2014 Eitarow Fukamachi (e.arrows@gmail.com)
+  Copyright (c) 2014 Eitaro Fukamachi (e.arrows@gmail.com)
 |#
 
 #|
   Lightweight database library.
 
-  Author: Eitarow Fukamachi (e.arrows@gmail.com)
+  Author: Eitaro Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
@@ -16,7 +16,7 @@
 
 (defsystem datafly
   :version "0.1"
-  :author "Eitarow Fukamachi"
+  :author "Eitaro Fukamachi"
   :license "BSD 3-Clause"
   :depends-on (:iterate
                :optima

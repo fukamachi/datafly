@@ -178,11 +178,11 @@ If no `:as` parameter is specified, `*default-row-type*` will be used.
 
 ## Author
 
-* Eitarow Fukamachi (e.arrows@gmail.com)
+* Eitaro Fukamachi (e.arrows@gmail.com)
 
 ## Copyright
 
-Copyright (c) 2014 Eitarow Fukamachi (e.arrows@gmail.com)
+Copyright (c) 2014 Eitaro Fukamachi (e.arrows@gmail.com)
 
 # License
 

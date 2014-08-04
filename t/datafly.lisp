@@ -1,8 +1,3 @@
-#|
-  This file is a part of datafly project.
-  Copyright (c) 2014 Eitarow Fukamachi (e.arrows@gmail.com)
-|#
-
 (in-package :cl-user)
 (defpackage datafly-test
   (:use :cl

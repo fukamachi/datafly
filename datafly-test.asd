@@ -1,6 +1,6 @@
 #|
   This file is a part of datafly project.
-  Copyright (c) 2014 Eitarow Fukamachi (e.arrows@gmail.com)
+  Copyright (c) 2014 Eitaro Fukamachi (e.arrows@gmail.com)
 |#
 
 (in-package :cl-user)
@@ -9,7 +9,7 @@
 (in-package :datafly-test-asd)
 
 (defsystem datafly-test
-  :author "Eitarow Fukamachi"
+  :author "Eitaro Fukamachi"
   :license "BSD 3-Clause"
   :depends-on (:datafly
                :cl-test-more

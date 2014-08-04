@@ -78,33 +78,37 @@
       nil
       value))
 
-(defun convert-row (row &key (as *default-row-type*))
-  (when row
-    (case as
-      ((null property-list)
-       (iter (for (column value) on row by #'cddr)
-         (collect (convert-column-name column))
-         (collect (convert-column-value value))))
-      (association-list
-       (iter (for (column value) on row by #'cddr)
-         (collect (cons (convert-column-name column)
-                        (convert-column-value value)))))
-      (hash-table
-       (let ((hash (make-hash-table :test 'eq)))
+(defun convert-row (row &key (as *default-row-type*) (prettify t))
+  (flet ((prettify-column-name (name)
+           (if prettify
+               (convert-column-name name)
+               name)))
+    (when row
+      (case as
+        ((null property-list)
          (iter (for (column value) on row by #'cddr)
-           (setf (gethash (convert-column-name column) hash)
-                 (convert-column-value value)))
-         hash))
-      (T
-       (let* ((class (find-class as))
-              (class-name (class-name class))
-              (class-package (symbol-package class-name))
-              (constructor (intern (format nil "~A~A" #.(string :make-) class-name)
-                                   class-package))
-              (row (iter (for (column value) on row by #'cddr)
-                     (collect (convert-column-name column))
-                     (collect (convert-column-value value)))))
-         (apply (symbol-function constructor) row))))))
+           (collect (prettify-column-name column))
+           (collect (convert-column-value value))))
+        (association-list
+         (iter (for (column value) on row by #'cddr)
+           (collect (cons (prettify-column-name column)
+                          (convert-column-value value)))))
+        (hash-table
+         (let ((hash (make-hash-table :test 'eq)))
+           (iter (for (column value) on row by #'cddr)
+             (setf (gethash (prettify-column-name column) hash)
+                   (convert-column-value value)))
+           hash))
+        (T
+         (let* ((class (find-class as))
+                (class-name (class-name class))
+                (class-package (symbol-package class-name))
+                (constructor (intern (format nil "~A~A" #.(string :make-) class-name)
+                                     class-package))
+                (row (iter (for (column value) on row by #'cddr)
+                       (collect (prettify-column-name column))
+                       (collect (convert-column-value value)))))
+           (apply (symbol-function constructor) row)))))))
 
 (defun get-prev-stack ()
   #+sbcl
@@ -134,7 +138,7 @@
       (apply #'dbi:execute prepared params))))
 
 @export
-(defun retrieve-one (statement &key by = (as *default-row-type*))
+(defun retrieve-one (statement &key by = (as *default-row-type*) (prettify t))
   (assert (eq (null by) (null =)))
   (when (keywordp statement)
     (setf statement
@@ -146,26 +150,28 @@
             (limit 1))))
   (convert-row
    (dbi:fetch (execute-with-connection *connection* statement))
-   :as as))
+   :as as
+   :prettify prettify))
 
 @export
-(defun retrieve-one-value (statement &optional key)
+(defun retrieve-one-value (statement &optional key (prettify t))
+  (declare (ignorable prettify))
   (if key
-      (getf (retrieve-one statement) key)
+      (getf (retrieve-one statement :prettify prettify) key)
       (second (retrieve-one statement))))
 
 @export
-(defun retrieve-all (statement &key (as *default-row-type*))
+(defun retrieve-all (statement &key (as *default-row-type*) (prettify t))
   (mapcar (lambda (row)
-            (convert-row row :as as))
+            (convert-row row :as as :prettify t))
           (dbi:fetch-all (execute-with-connection *connection* statement))))
 
 @export
-(defun retrieve-all-values (statement &optional key)
+(defun retrieve-all-values (statement &optional key (prettify t))
   (mapcar (if key
               (lambda (row) (getf row key))
               #'second)
-          (retrieve-all statement)))
+          (retrieve-all statement :prettify prettify)))
 
 @export
 (defun execute (statement)

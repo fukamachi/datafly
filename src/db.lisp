@@ -130,12 +130,13 @@
       (let ((sxql:*quote-character* (or sxql:*quote-character*
                                         (connection-quote-character *connection*))))
         (sxql:yield statement))
-    (when *trace-sql*
-      (let ((stack (get-prev-stack)))
-        (log:trace :logger *sql-logger*
-                   "~A (~{~S~^, ~})~:[~;~:* | ~S~]" sql params stack)))
-    (let ((prepared (dbi:prepare conn sql)))
-      (apply #'dbi:execute prepared params))))
+    (let* ((prepared (dbi:prepare conn sql))
+           (results (dbi:fetch-all (apply #'dbi:execute prepared params))))
+      (when *trace-sql*
+        (let ((stack (get-prev-stack)))
+          (log:trace :logger *sql-logger*
+                     "~A (~{~S~^, ~}) [~D row~:P]~:[~;~:* | ~S~]" sql params (length results) stack)))
+      results)))
 
 @export
 (defun retrieve-one (statement &key by = (as *default-row-type*) (prettify t))
@@ -149,7 +150,7 @@
                 nil)
             (limit 1))))
   (convert-row
-   (dbi:fetch (execute-with-connection *connection* statement))
+   (first (execute-with-connection *connection* statement))
    :as as
    :prettify prettify))
 
@@ -163,8 +164,8 @@
 @export
 (defun retrieve-all (statement &key (as *default-row-type*) (prettify t))
   (mapcar (lambda (row)
-            (convert-row row :as as :prettify t))
-          (dbi:fetch-all (execute-with-connection *connection* statement))))
+            (convert-row row :as as :prettify prettify))
+          (execute-with-connection *connection* statement)))
 
 @export
 (defun retrieve-all-values (statement &optional key (prettify t))
@@ -175,4 +176,5 @@
 
 @export
 (defun execute (statement)
-  (execute-with-connection *connection* statement))
+  (execute-with-connection *connection* statement)
+  (values))

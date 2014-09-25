@@ -129,7 +129,9 @@
   (multiple-value-bind (sql params)
       (let ((sxql:*quote-character* (or sxql:*quote-character*
                                         (connection-quote-character *connection*))))
-        (sxql:yield statement))
+        (typecase statement
+          (string (values statement nil))
+          (otherwise (sxql:yield statement))))
     (let* ((prepared (dbi:prepare conn sql))
            (results (dbi:fetch-all (apply #'dbi:execute prepared params))))
       (when *trace-sql*

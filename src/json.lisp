@@ -54,7 +54,7 @@
        (collect (cons key
                       (convert-for-json val)))))
     ((or list simple-vector)
-     (map 'list
+     (map 'simple-vector
           #'convert-for-json
           object))
     (T object)))

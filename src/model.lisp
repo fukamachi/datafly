@@ -56,7 +56,12 @@
                              (apply #'retrieve-one
                                     (with-slots (,@slot-names) ,name
                                       (declare (ignorable ,@slot-names))
-                                      ,sxql)
+                                      (select :*
+                                        (from ,(intern (substitute #\_ #\-
+                                                                   (symbol-name (or model-class slot-name)))
+                                                       :keyword))
+                                        ,sxql
+                                        (limit 1)))
                                     (and (find-class ',(or model-class slot-name) nil)
                                          '(:as ,(or model-class slot-name)))))))))))
            ,@(multiple-value-bind (has-many-options rest-options)

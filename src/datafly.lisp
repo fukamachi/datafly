@@ -10,6 +10,7 @@
                 :retrieve-one
                 :retrieve-one-value
                 :retrieve-all
+                :retrieve-all-values
                 :execute)
   (:import-from :datafly.model
                 :model
@@ -39,6 +40,7 @@
            :retrieve-one
            :retrieve-one-value
            :retrieve-all
+           :retrieve-all-values
            :execute
 
            :model

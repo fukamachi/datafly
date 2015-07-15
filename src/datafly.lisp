@@ -56,6 +56,7 @@
            :datetime-to-timestamp
            :unixtime-to-timestamp
            :string-to-keyword
+           :octet-vector-to-string
 
            :encode-json
            :convert-object))

@@ -1,5 +1,7 @@
 # datafly
 
+[![Build Status](https://travis-ci.org/fukamachi/datafly.svg?branch=master)](https://travis-ci.org/fukamachi/datafly)
+
 Datafly is a lightweight database library for Common Lisp.
 
 ## Quickstart

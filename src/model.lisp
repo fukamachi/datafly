@@ -13,6 +13,7 @@
   (:import-from :datafly.util
                 :partition)
   (:import-from :alexandria
+                :with-gensyms
                 :ensure-list
                 :ensure-car
                 :make-keyword))
@@ -52,18 +53,22 @@
                     (let ((accessor (intern (format nil "~A~A" conc-name slot-name))))
                       (push accessor accessors)
                       (collect
-                          `(defcached-accessor ,accessor (,name) (,name)
-                             (apply #'retrieve-one
-                                    (with-slots (,@slot-names) ,name
-                                      (declare (ignorable ,@slot-names))
-                                      (select :*
-                                        (from ,(intern (substitute #\_ #\-
-                                                                   (symbol-name (or model-class slot-name)))
-                                                       :keyword))
-                                        ,sxql
-                                        (limit 1)))
-                                    (and (find-class ',(or model-class slot-name) nil)
-                                         '(:as ,(or model-class slot-name)))))))))))
+                          (with-gensyms (g-sxql)
+                            `(defcached-accessor ,accessor (,name) (,name)
+                               (apply #'retrieve-one
+                                      (with-slots (,@slot-names) ,name
+                                        (declare (ignorable ,@slot-names))
+                                        (let ((,g-sxql ,sxql))
+                                          (if (typep ,g-sxql 'sxql:select-statement-designator)
+                                              ,g-sxql
+                                              (select :*
+                                                (from ,(intern (substitute #\_ #\-
+                                                                           (symbol-name (or model-class slot-name)))
+                                                               :keyword))
+                                                ,g-sxql
+                                                (limit 1)))))
+                                      (and (find-class ',(or model-class slot-name) nil)
+                                           '(:as ,(or model-class slot-name))))))))))))
            ,@(multiple-value-bind (has-many-options rest-options)
                  (partition :has-many options :key #'car :test #'eq)
                (setf options rest-options)

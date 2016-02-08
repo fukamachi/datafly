@@ -2,9 +2,6 @@
 (defpackage datafly.json
   (:use :cl
         :iterate)
-  (:import-from :cl-json
-                #+nil :encode-json
-                :encode-json-to-string)
   (:import-from :local-time
                 :timestamp
                 :timestamp-to-unix)
@@ -36,42 +33,64 @@
     (object-to-plist object)))
 
 (defun convert-for-json (object)
-  (typecase object
-    (hash-table
-     (let ((hash (copy-hash-table object)))
-       (iter (for (key val) in-hashtable hash)
-         (setf (gethash key hash) (convert-for-json val)))
-       hash))
-    (local-time:timestamp
-     (local-time:timestamp-to-unix object))
-    ((or structure-object
-         standard-object)
-     (let ((hash (make-hash-table :test 'eq)))
-       (iter (for slot in (c2mop:class-direct-slots (class-of object)))
-         (let ((slot-name (c2mop:slot-definition-name slot)))
-           (setf (gethash slot-name hash)
-                 (convert-for-json (slot-value object slot-name)))))
-       hash))
-    (null nil)
-    ((satisfies property-list-p)
-     (let ((hash (make-hash-table :test 'eq)))
-       (iter (for (key val) on object by #'cddr)
-         (setf (gethash key hash) (convert-for-json val)))
-       hash))
-    ((satisfies association-list-p)
-     (let ((hash (make-hash-table :test 'equal)))
-       (iter (for (key . val) in object)
-         (setf (gethash key hash) (convert-for-json val)))
-       hash))
-    ((or list simple-vector)
-     (map 'simple-vector
-          #'convert-for-json
-          object))
-    (T object)))
+  (flet ((convert-key (key)
+           (kebab:to-camel-case (princ-to-string key))))
+    (typecase object
+      (hash-table
+       (jojo:with-object
+         (iter (for (key val) in-hashtable object)
+           (jojo:write-key (convert-key key))
+           (jojo:%write-char #\:)
+           (convert-for-json val))))
+      (local-time:timestamp
+       (jojo:%to-json (local-time:timestamp-to-unix object)))
+      ((or structure-object
+           standard-object)
+       (jojo:with-object
+         (iter (for slot in (c2mop:class-direct-slots (class-of object)))
+           (let ((slot-name (c2mop:slot-definition-name slot)))
+             (jojo:write-key (convert-key slot-name))
+             (jojo:%write-char #\:)
+             (convert-for-json (slot-value object slot-name))))))
+      (null (jojo:%to-json :null))
+      ((satisfies property-list-p)
+       (jojo:with-object
+         (iter (for (key val) on object by #'cddr)
+           (jojo:write-key (convert-key key))
+           (jojo:%write-char #\:)
+           (convert-for-json val))))
+      ((satisfies association-list-p)
+       (jojo:with-object
+         (iter (for (key . val) in object)
+           (jojo:write-key (convert-key key))
+           (jojo:%write-char #\:)
+           (convert-for-json val))))
+      (list
+       (jojo:%write-char #\[)
+       (loop with first = t
+             for o in object
+             do (if first
+                    (setf first nil)
+                    (jojo:%write-char #\,))
+                (convert-for-json o))
+       (jojo:%write-char #\]))
+      ((and vector (not string))
+       (jojo:%write-char #\[)
+       (loop with first = t
+             for o across object
+             do (if first
+                    (setf first nil)
+                    (jojo:%write-char #\,))
+                (convert-for-json o))
+       (jojo:%write-char #\]))
+      (keyword (let ((*print-case* :downcase))
+                 (jojo:%to-json (princ-to-string object))))
+      (t (jojo:%to-json object)))))
 
 @export
 (defgeneric encode-json (object &optional stream)
   (:method ((object t) &optional stream)
     (if stream
-        (cl-json:encode-json (convert-for-json object) stream)
-        (cl-json:encode-json-to-string (convert-for-json object)))))
+        (jojo:with-output (stream)
+          (convert-for-json object))
+        (jojo:with-output-to-string* (convert-for-json object)))))

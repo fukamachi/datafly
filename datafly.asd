@@ -29,7 +29,8 @@
                :babel
                :local-time
                :function-cache
-               :cl-json
+               :jonathan
+               :kebab
                :log4cl)
   :components ((:module "src"
                 :components

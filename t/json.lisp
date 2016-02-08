@@ -27,10 +27,10 @@
 
 (let* ((json
          (encode-json (alexandria:plist-hash-table `(:name "Eitaro" :status :registered :created-at ,*timestamp*))))
-       (decoded (cl-json:decode-json-from-string json)))
-  (is (cdr (assoc :name decoded)) "Eitaro")
-  (is (cdr (assoc :status decoded)) "registered")
-  (is (cdr (assoc :created-at decoded)) 1360850770))
+       (decoded (jojo:parse json :as :alist)))
+  (is (cdr (assoc "name" decoded :test #'string=)) "Eitaro")
+  (is (cdr (assoc "status" decoded :test #'string=)) "registered")
+  (is (cdr (assoc "createdAt" decoded :test #'string=)) 1360850770))
 
 (is (encode-json `((:name . "Eitaro") (:status . :registered) (:created-at . ,*timestamp*)
                                       (:settings . (("timezone" . "JST")))))

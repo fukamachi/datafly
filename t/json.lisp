@@ -5,7 +5,7 @@
         :cl-test-more))
 (in-package :datafly-test.json)
 
-(plan 9)
+(plan 10)
 
 (defvar *timestamp*
   (local-time:unix-to-timestamp 1360850770))
@@ -22,6 +22,8 @@
 (is (encode-json `((:name . "Eitaro") (:status . :registered) (:created-at . ,*timestamp*)))
     "{\"name\":\"Eitaro\",\"status\":\"registered\",\"createdAt\":1360850770}"
     "Association List")
+
+(is (encode-json '(:name nil)) "{\"name\":null}")
 
 (let* ((json
          (encode-json (alexandria:plist-hash-table `(:name "Eitaro" :status :registered :created-at ,*timestamp*))))

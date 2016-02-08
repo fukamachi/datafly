@@ -10,7 +10,9 @@
                 :timestamp-to-unix)
   (:import-from :trivial-types
                 :property-list-p
-                #+nil :association-list-p))
+                #+nil :association-list-p)
+  (:import-from #:alexandria
+                #:copy-hash-table))
 (in-package :datafly.json)
 
 (syntax:use-syntax :annot)
@@ -36,23 +38,31 @@
 (defun convert-for-json (object)
   (typecase object
     (hash-table
-     (iter (for (key val) in-hashtable object)
-       (collect (cons key
-                      (convert-for-json val)))))
+     (let ((hash (copy-hash-table object)))
+       (iter (for (key val) in-hashtable hash)
+         (setf (gethash key hash) (convert-for-json val)))
+       hash))
     (local-time:timestamp
      (local-time:timestamp-to-unix object))
     ((or structure-object
          standard-object)
-     (iter (for (k v) on (convert-object object) by #'cddr)
-       (collect (cons k (convert-for-json v)))))
+     (let ((hash (make-hash-table :test 'eq)))
+       (iter (for slot in (c2mop:class-direct-slots (class-of object)))
+         (let ((slot-name (c2mop:slot-definition-name slot)))
+           (setf (gethash slot-name hash)
+                 (convert-for-json (slot-value object slot-name)))))
+       hash))
+    (null nil)
     ((satisfies property-list-p)
-     (iter (for (key val) on object by #'cddr)
-       (collect (cons key
-                      (convert-for-json val)))))
+     (let ((hash (make-hash-table :test 'eq)))
+       (iter (for (key val) on object by #'cddr)
+         (setf (gethash key hash) (convert-for-json val)))
+       hash))
     ((satisfies association-list-p)
-     (iter (for (key . val) in object)
-       (collect (cons key
-                      (convert-for-json val)))))
+     (let ((hash (make-hash-table :test 'equal)))
+       (iter (for (key . val) in object)
+         (setf (gethash key hash) (convert-for-json val)))
+       hash))
     ((or list simple-vector)
      (map 'simple-vector
           #'convert-for-json

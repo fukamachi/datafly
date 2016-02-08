@@ -6,19 +6,18 @@ env:
   global:
     - PATH=~/.roswell/bin:$PATH
     - ROSWELL_INSTALL_DIR=$HOME/.roswell
-    - ROSWELL_REQUIRE_SUDO=0
   matrix:
-    - LISP=sbcl
-    - LISP=ccl
-
-before_install:
-  - curl -L https://raw.githubusercontent.com/fukamachi/roswell/require-sudo/scripts/install-for-ci.sh | sh
+    - LISP=sbcl-bin
+    - LISP=ccl-bin
 
 install:
+  # Install Roswell
+  - curl -L https://raw.githubusercontent.com/snmsts/roswell/release/scripts/install-for-ci.sh | sh
   - ros install prove
 
 before_script:
-  - ros run -- --version
+  - ros --version
+  - ros config
 
 script:
   - run-prove datafly-test.asd

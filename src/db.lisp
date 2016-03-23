@@ -36,15 +36,17 @@
 
 @export
 (defun connect-cached (&rest connect-args)
-  (let ((conn (gethash connect-args *connections*)))
+  (let* ((thread-args (cons (format nil "~s" SB-THREAD:*CURRENT-THREAD*)
+                            connect-args))
+         (conn (gethash thread-args *connections*)))
     (cond
       ((null conn)
-       (setf (gethash connect-args *connections*)
+       (setf (gethash thread-args *connections*)
              (apply #'dbi:connect
                     connect-args)))
       ((not (dbi:ping conn))
        (dbi:disconnect conn)
-       (remhash connect-args *connections*)
+       (remhash thread-args *connections*)
        (apply #'connect-cached connect-args))
       (T conn))))
 

@@ -85,6 +85,10 @@
                name)))
     (when row
       (case as
+        (:scalar
+         (if (not (listp row))
+             row
+             (error "The row is a list, not a scalar value.")))
         ((null property-list)
          (iter (for (column value) on row by #'cddr)
            (collect (prettify-column-name column))

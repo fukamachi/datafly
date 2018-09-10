@@ -20,4 +20,5 @@ before_script:
   - ros config
 
 script:
+  - ros -S . -s datafly-test
   - run-prove datafly-test.asd

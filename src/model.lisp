@@ -4,6 +4,8 @@
         :optima
         :iterate
         :sxql)
+  (:shadowing-import-from :iterate
+                          :for)
   (:import-from :datafly.db
                 :retrieve-one
                 :retrieve-all)

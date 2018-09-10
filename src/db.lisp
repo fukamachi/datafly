@@ -3,6 +3,8 @@
   (:use :cl
         :iterate
         :sxql)
+  (:shadowing-import-from :iterate
+                          :for)
   (:import-from :datafly.logger
                 :*sql-logger*
                 :*trace-sql*)

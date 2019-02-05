@@ -44,7 +44,7 @@
        (setf (gethash connect-args *connections*)
              (apply #'dbi:connect
                     connect-args)))
-      ((not (dbi:ping conn))
+      ((or (member :sqlite3 connect-args) (not (dbi:ping conn)))
        (dbi:disconnect conn)
        (remhash connect-args *connections*)
        (apply #'connect-cached connect-args))

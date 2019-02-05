@@ -15,8 +15,18 @@
 (syntax:use-syntax :annot)
 
 (defun association-list-p (object)
-  (and (trivial-types:association-list-p object)
-       (not (eq (caar object) (caadr object)))))
+  (and (listp object)
+       (listp (car object))
+       (destructuring-bind (a . b) (car object)
+	 (not (listp b)))))
+
+(defun property-list-p (object)
+  (and (listp object)
+       (not (null object))
+       (listp (cdr object))
+       (not (null (cdr object)))
+       (destructuring-bind (a b &rest r) object
+	 (keywordp a))))
 
 (defun object-to-plist (object)
   (let ((slots (c2mop:class-direct-slots (class-of object))))

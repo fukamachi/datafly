@@ -5,7 +5,7 @@
         :cl-test-more))
 (in-package :datafly-test.json)
 
-(plan 10)
+(plan 11)
 
 (defvar *timestamp*
   (local-time:unix-to-timestamp 1360850770))
@@ -18,6 +18,10 @@
                    (:name "Tomohiro" :status :temporary :created-at ,(local-time:timestamp+ *timestamp* 1 :day))))
     "[{\"name\":\"Eitaro\",\"status\":\"registered\",\"createdAt\":1360850770},{\"name\":\"Tomohiro\",\"status\":\"temporary\",\"createdAt\":1360937170}]"
     "Property List")
+
+(is (encode-json `((:name "Eitaro" :status :registered :created-at ,*timestamp*)))
+    "[{\"name\":\"Eitaro\",\"status\":\"registered\",\"createdAt\":1360850770}]"
+    "Single Item List With Property List (Simulating single row returned by retrieve-all)")
 
 (is (encode-json `((:name . "Eitaro") (:status . :registered) (:created-at . ,*timestamp*)))
     "{\"name\":\"Eitaro\",\"status\":\"registered\",\"createdAt\":1360850770}"

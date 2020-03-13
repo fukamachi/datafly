@@ -135,7 +135,7 @@
           (string (values statement nil))
           (otherwise (sxql:yield statement))))
     (let* ((prepared (dbi:prepare conn sql))
-           (results (dbi:fetch-all (apply #'dbi:execute prepared params))))
+           (results (dbi:fetch-all (dbi:execute prepared params))))
       (when *trace-sql*
         (let ((stack (get-prev-stack)))
           (log:trace :logger *sql-logger*

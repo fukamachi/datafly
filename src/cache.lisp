@@ -7,7 +7,7 @@
                 :compose))
 (in-package :datafly.cache)
 
-(syntax:use-syntax :annot)
+(annot:enable-annot-syntax)
 
 (defvar *model-accessors* (make-hash-table :test 'eq))
 

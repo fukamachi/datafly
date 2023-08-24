@@ -12,7 +12,7 @@
                 #:copy-hash-table))
 (in-package :datafly.json)
 
-(syntax:use-syntax :annot)
+(annot:enable-annot-syntax)
 
 (defun association-list-p (object)
   (and (listp object)

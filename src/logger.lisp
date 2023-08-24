@@ -3,7 +3,7 @@
   (:use :cl))
 (in-package datafly.logger)
 
-(syntax:use-syntax :annot)
+(annot:enable-annot-syntax)
 
 @export
 (defvar *trace-sql* nil)

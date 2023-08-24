@@ -20,7 +20,7 @@
                 :make-keyword))
 (in-package :datafly.model)
 
-(syntax:use-syntax :annot)
+(annot:enable-annot-syntax)
 
 @export
 (defmacro defmodel (name-and-options &body slot-descriptions)

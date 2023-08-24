@@ -15,7 +15,7 @@
                 :octets-to-string))
 (in-package :datafly.inflate)
 
-(syntax:use-syntax :annot)
+(annot:enable-annot-syntax)
 
 @export
 (defun tinyint-to-boolean (val)

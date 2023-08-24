@@ -22,7 +22,7 @@
                 :association-list))
 (in-package :datafly.db)
 
-(syntax:use-syntax :annot)
+(annot:enable-annot-syntax)
 
 @export
 (defvar *connection* nil)

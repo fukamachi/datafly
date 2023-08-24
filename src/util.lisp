@@ -3,7 +3,7 @@
   (:use :cl))
 (in-package :datafly.util)
 
-(syntax:use-syntax :annot)
+(annot:enable-annot-syntax)
 
 @export
 (defun partition-if (pred sequence &key from-end (start 0) end (key #'identity))

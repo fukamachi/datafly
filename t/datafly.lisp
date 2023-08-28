@@ -2,6 +2,7 @@
 (defpackage datafly-test
   (:use :cl
         :datafly
+        :datafly.syntax
         :cl-test-more
         :sxql))
 (in-package :datafly-test)
@@ -64,7 +65,7 @@
              (where (:= :name "nitro_idiot"))))))
     (is user `(:id 1 :name "nitro_idiot" :email "e.arrows@gmail.com" :status "normal" :created-at ,(princ-to-string *now*) :updated-at nil))))
 
-(syntax:use-syntax :annot)
+(enable-syntax)
 
 @model
 (defstruct (user (:inflate (created-at updated-at) #'datetime-to-timestamp)

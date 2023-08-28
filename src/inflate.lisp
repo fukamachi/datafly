@@ -1,6 +1,7 @@
 (in-package :cl-user)
 (defpackage datafly.inflate
-  (:use :cl)
+  (:use :cl
+        :datafly.syntax)
   (:import-from :datafly.db
                 :database-type)
   (:import-from :alexandria
@@ -15,7 +16,7 @@
                 :octets-to-string))
 (in-package :datafly.inflate)
 
-(syntax:use-syntax :annot)
+(enable-syntax)
 
 @export
 (defun tinyint-to-boolean (val)

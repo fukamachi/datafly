@@ -1,9 +1,10 @@
 (in-package :cl-user)
 (defpackage datafly.logger
-  (:use :cl))
+  (:use :cl
+        :datafly.syntax))
 (in-package datafly.logger)
 
-(syntax:use-syntax :annot)
+(enable-syntax)
 
 @export
 (defvar *trace-sql* nil)

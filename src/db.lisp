@@ -2,7 +2,8 @@
 (defpackage :datafly.db
   (:use :cl
         :iterate
-        :sxql)
+        :sxql
+        :datafly.syntax)
   (:shadowing-import-from :iterate
                           :for)
   (:import-from :datafly.logger
@@ -22,7 +23,7 @@
                 :association-list))
 (in-package :datafly.db)
 
-(syntax:use-syntax :annot)
+(enable-syntax)
 
 @export
 (defvar *connection* nil)

@@ -3,7 +3,8 @@
   (:use :cl
         :optima
         :iterate
-        :sxql)
+        :sxql
+        :datafly.syntax)
   (:shadowing-import-from :iterate
                           :for)
   (:import-from :datafly.db
@@ -20,7 +21,7 @@
                 :make-keyword))
 (in-package :datafly.model)
 
-(syntax:use-syntax :annot)
+(enable-syntax)
 
 @export
 (defmacro defmodel (name-and-options &body slot-descriptions)

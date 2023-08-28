@@ -1,7 +1,8 @@
 (in-package :cl-user)
 (defpackage datafly.json
   (:use :cl
-        :iterate)
+        :iterate
+        :datafly.syntax)
   (:import-from :local-time
                 :timestamp
                 :timestamp-to-unix)
@@ -12,7 +13,7 @@
                 #:copy-hash-table))
 (in-package :datafly.json)
 
-(syntax:use-syntax :annot)
+(enable-syntax)
 
 (defun association-list-p (object)
   (and (listp object)

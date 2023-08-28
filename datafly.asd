@@ -6,7 +6,7 @@
                "optima"
                "trivial-types"
                "closer-mop"
-               "cl-syntax-annot"
+               "named-readtables"
                "sxql"
                "dbi"
                "alexandria"
@@ -18,13 +18,14 @@
                "log4cl")
   :components ((:module "src"
                 :components
-                ((:file "datafly" :depends-on ("model" "db" "cache" "logger" "inflate" "json"))
-                 (:file "model" :depends-on ("db" "cache" "util"))
-                 (:file "db" :depends-on ("logger"))
-                 (:file "cache")
-                 (:file "logger")
-                 (:file "inflate" :depends-on ("db"))
-                 (:file "json")
+                ((:file "datafly" :depends-on ("model" "db" "cache" "logger" "inflate" "json" "syntax"))
+                 (:file "model" :depends-on ("db" "cache" "syntax" "util"))
+                 (:file "db" :depends-on ("logger" "syntax"))
+                 (:file "cache" :depends-on ("syntax"))
+                 (:file "logger" :depends-on ("syntax"))
+                 (:file "inflate" :depends-on ("db" "syntax"))
+                 (:file "json" :depends-on ("syntax"))
+                 (:file "syntax")
                  (:file "util"))))
   :description "Lightweight database library."
   :long-description

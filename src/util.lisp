@@ -1,9 +1,10 @@
 (in-package :cl-user)
 (defpackage datafly.util
-  (:use :cl))
+  (:use :cl
+        :datafly.syntax))
 (in-package :datafly.util)
 
-(syntax:use-syntax :annot)
+(enable-syntax)
 
 @export
 (defun partition-if (pred sequence &key from-end (start 0) end (key #'identity))

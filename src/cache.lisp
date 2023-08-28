@@ -2,12 +2,13 @@
 (defpackage datafly.cache
   (:use :cl
         :iterate
-        :function-cache)
+        :function-cache
+        :datafly.syntax)
   (:import-from :alexandria
                 :compose))
 (in-package :datafly.cache)
 
-(syntax:use-syntax :annot)
+(enable-syntax)
 
 (defvar *model-accessors* (make-hash-table :test 'eq))
 

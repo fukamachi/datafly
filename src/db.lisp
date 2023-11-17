@@ -114,18 +114,59 @@
            (apply (symbol-function constructor) row)))))))
 
 (defun get-prev-stack ()
-  #+sbcl
-  (let (prev-stack)
-    (sb-debug::map-backtrace
-     (lambda (frame)
-       (let ((fun (sb-di::debug-fun-name (sb-di::frame-debug-fun frame))))
-         (when (and (null prev-stack)
-                    (symbolp fun)
-                    (not (find (package-name (symbol-package fun))
-                               (list :common-lisp :datafly.db :function-cache)
-                               :test #'string=)))
-           (setf prev-stack fun)))))
-    prev-stack))
+  (labels ((normalize-call (call)
+             (typecase call
+               (symbol call)
+               (cons
+                 (case (first call)
+                   (:method (second call))
+                   ((lambda flet labels) nil)
+                   (otherwise (second call))))))
+           #+sbcl
+           (sbcl-package-p (package)
+             (let ((name (package-name package)))
+               (eql (mismatch "SB-" name) 3)))
+           (system-call-p (call)
+             (when call
+               (let ((package (symbol-package call)))
+                 (and package
+                      (or #+sbcl (sbcl-package-p package)
+                          (find (package-name package)
+                                '(:common-lisp :datafly.logger :datafly.db :dbi.logger :dbi.driver)
+                                :test #'string=))))))
+           (users-call-p (call)
+             (and call
+                  (or (not (symbolp call))
+                      (not (system-call-p call))))))
+
+    #+sbcl
+    (do ((frame (sb-di:frame-down (sb-di:top-frame))
+                (sb-di:frame-down frame)))
+        ((null frame))
+      (multiple-value-bind (call args info)
+          (sb-debug::frame-call frame)
+        (declare (ignore args info))
+        (let ((call (normalize-call call)))
+          (when (users-call-p call)
+            (return call)))))
+    #+ccl
+    (block nil
+      (let ((i 0))
+        (ccl:map-call-frames
+          (lambda (pointer context)
+            (let* ((function (ccl:frame-function pointer context))
+                   (call (normalize-call (or (ccl:function-name function) function))))
+              (when (users-call-p call)
+                (return call)))
+            (incf i))
+          :start-frame-number 1)))
+    #-(or sbcl ccl)
+    (loop with prev-stack = nil
+          for stack in (dissect:stack)
+          for call = (let ((call (dissect:call stack)))
+                       (normalize-call call))
+          when (users-call-p call)
+          do (return call))))
 
 (defun execute-with-connection (conn statement)
   (check-type conn dbi.driver:<dbi-connection>)

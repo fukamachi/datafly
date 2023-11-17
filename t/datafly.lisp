@@ -1,5 +1,4 @@
-(in-package :cl-user)
-(defpackage datafly-test
+(uiop:define-package datafly-test
   (:use :cl
         :datafly
         :datafly.syntax

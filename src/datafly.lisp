@@ -1,4 +1,3 @@
-(in-package :cl-user)
 (defpackage datafly
   (:use :cl)
   (:import-from :datafly.db

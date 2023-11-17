@@ -1,5 +1,4 @@
-(in-package :cl-user)
-(defpackage datafly.json
+(uiop:define-package datafly.json
   (:use :cl
         :iterate
         :datafly.syntax)

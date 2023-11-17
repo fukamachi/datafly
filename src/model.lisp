@@ -1,5 +1,4 @@
-(in-package :cl-user)
-(defpackage datafly.model
+(uiop:define-package datafly.model
   (:use :cl
         :optima
         :iterate

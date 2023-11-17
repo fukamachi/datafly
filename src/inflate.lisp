@@ -1,5 +1,4 @@
-(in-package :cl-user)
-(defpackage datafly.inflate
+(uiop:define-package datafly.inflate
   (:use :cl
         :datafly.syntax)
   (:import-from :datafly.db

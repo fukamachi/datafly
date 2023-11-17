@@ -1,4 +1,3 @@
-(in-package :cl-user)
 (defpackage datafly-test.json
   (:use :cl
         :datafly

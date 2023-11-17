@@ -1,5 +1,4 @@
-(in-package :cl-user)
-(defpackage datafly.cache
+(uiop:define-package datafly.cache
   (:use :cl
         :iterate
         :function-cache

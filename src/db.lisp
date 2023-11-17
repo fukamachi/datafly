@@ -1,5 +1,4 @@
-(in-package :cl-user)
-(defpackage :datafly.db
+(uiop:define-package :datafly.db
   (:use :cl
         :iterate
         :sxql

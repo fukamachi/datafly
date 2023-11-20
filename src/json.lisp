@@ -42,6 +42,38 @@
   (:method ((object standard-object))
     (object-to-plist object)))
 
+(defun convert-for-json-verbose (object)
+  (typecase object
+    (hash-table
+     (format t "found hash~%")
+     (iter (for (key val) in-hashtable object)
+       (collect (cons key
+                      (convert-for-json val)))))
+    (local-time:timestamp
+     (format t "found ts~%")
+     (local-time:timestamp-to-unix object))
+    ((or structure-object
+         standard-object)
+     (format t "found object~%")
+     (iter (for (k v) on (convert-object object) by #'cddr)
+       (collect (cons k (convert-for-json v)))))
+    ((satisfies property-list-p)
+     (format t "found plist~%")
+     (iter (for (key val) on object by #'cddr)
+       (collect (cons key
+                      (convert-for-json val)))))
+    ((satisfies association-list-p)
+     (format t "found alist~%")
+     (iter (for (key . val) in object)
+       (collect (cons key
+                      (convert-for-json val)))))
+    ((or list simple-vector)
+     (format t "found list or simple-vector~%")
+     (map 'simple-vector
+          #'convert-for-json
+          object))
+    (T object)))
+
 (defun convert-for-json (object)
   (flet ((convert-key (key)
            (kebab:to-camel-case (princ-to-string key))))

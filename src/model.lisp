@@ -82,11 +82,11 @@
                                     (let ((,sxql-query (with-slots (,@slot-names) ,name
                                                          (declare (ignorable ,@slot-names))
                                                          ,sxql)))
-                                      (setf (sxql.statement:select-statement-limit-clause ,sxql-query)
+                                      (setf (sxql/statement::select-statement-limit-clause ,sxql-query)
                                             (if limit
                                                 (list (limit limit))
                                                 nil))
-                                      (setf (sxql.statement:select-statement-offset-clause ,sxql-query)
+                                      (setf (sxql/statement::select-statement-offset-clause ,sxql-query)
                                             (if offset
                                                 (list (offset offset))
                                                 nil))

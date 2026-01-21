@@ -184,7 +184,7 @@
       results)))
 
 @export
-(defun retrieve-one (statement &key by = (as *default-row-type*) (prettify t))
+(defun retrieve-one (statement &key by = (as *default-row-type*) (prettify t) (*connection* *connection*))
   (assert (eq (null by) (null =)))
   (when (keywordp statement)
     (setf statement
@@ -207,7 +207,7 @@
       (second (retrieve-one statement))))
 
 @export
-(defun retrieve-all (statement &key (as *default-row-type*) (prettify t))
+(defun retrieve-all (statement &key (as *default-row-type*) (prettify t) (*connection* *connection*))
   (mapcar (lambda (row)
             (convert-row row :as as :prettify prettify))
           (execute-with-connection *connection* statement)))
@@ -220,6 +220,6 @@
           (retrieve-all statement :prettify prettify)))
 
 @export
-(defun execute (statement)
+(defun execute (statement &key (*connection* *connection*))
   (execute-with-connection *connection* statement)
   (values))
